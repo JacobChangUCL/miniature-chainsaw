@@ -1,5 +1,4 @@
 Security and privay individual 
-
-#http flood
-#brute force
-#
+http flood
+##brute force attack
+##SQL injection attack
