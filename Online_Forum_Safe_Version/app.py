@@ -2,7 +2,7 @@ from flask import Flask, render_template, session, redirect, url_for, request, j
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from sqlalchemy import create_engine
-
+import time
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = 'my_secret_key'
@@ -61,6 +61,7 @@ def login_check():
             return redirect(url_for('upload'))
         else:
             flash('Invalid username or password')
+            time.sleep(1.5)
             return redirect(url_for('login'))
         captchaName = request.form.get('captchaName')
         # if captchaName != 'panda':
