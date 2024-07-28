@@ -47,6 +47,8 @@ security-and-privacy/
 │   │
 │   ├── data/                      # raw images for generating adversarial examples
 │   │   ├── caltech101             # Caltech 101 dataset
+│   │   │   └── 101_small          # A subset of the Caltech 101 dataset
+│   │   ├── imagenet_classes.txt   # ImageNet classes labels
 │   │   └── tiny-imagenet-200      # Tiny ImageNet-200 dataset(deprecated)
 │   │
 │   ├── environment.yaml      # Environment configuration file
@@ -65,8 +67,8 @@ security-and-privacy/
 │
 └── requirements.txt
 ```
-usage:<br>
-for the online forum safe version & unsafe version:
+Usage:<br>
+For the online forum safe version & unsafe version:
 ```plaintext
     conda create -n security python=3.12
     conda activate security
@@ -76,21 +78,31 @@ for the online forum safe version & unsafe version:
 ```
 Then click the link to enter the URL http://127.0.0.1:5000.<br>
 
-execute various attacks in the attacker folder:  
+Execute various attacks in the attacker folder:  
 (please make sure the server is running)
 ```plaintext
     cd attacker
     python dictionary_attack.py
     python http_flood.py
 ```
-for SQL injection attack, please enter the SQL injection commands in SQL injection list.txt to test the website.  
+For SQL injection attack, please enter the SQL injection commands in SQL injection list.txt to test the website.  
 
-for adversarial attack:
+For adversarial attack:
 ```plaintext
     conda create -n adversarial python=3.12.3
     conda activate adversarial
     pip install -r requirements_adversarial.txt
     cd adversarial_attack
+```
+A subset of the Caltech 101 dataset is given in the data folder, and it's enough to generate adversarial examples.   
+If you want to generate more kinds of adversarial CAPTCHA, please download the caltech101 dataset using torchvision:  
+```plaintext
+    from torchvision import datasets
+    datasets.Caltech101(root='./data', download=True)
+```
+Then run the following command:
+```plaintext
     python STGM_batch_version.py
 ```
 The STGM_batch_version.py file will generate adversarial examples using STGM(stochastic targeted gradient method).
+if you want to see more details, please refer to the STGM.ipynb file.
