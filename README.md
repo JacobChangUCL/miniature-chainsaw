@@ -64,6 +64,33 @@ security-and-privacy/
 ├── README.md
 │
 └── requirements.txt
-#### http flood
-#### brute force attack
-#### SQL injection attack
+```
+usage:<br>
+for the online forum safe version & unsafe version:
+```plaintext
+    conda create -n security python=3.7
+    conda activate security
+    pip install -r requirements_online_forum.txt
+    cd Online_Forum_Safe_Version       # or Online_Forum_Unsafe_Version
+    python app.py
+```
+Then click the link to enter the URL http://127.0.0.1:5000.<br>
+
+execute various attacks in the attacker folder:  
+(please make sure the server is running)
+```plaintext
+    cd attacker
+    python dictionary_attack.py
+    python http_flood.py
+```
+for SQL injection attack, please enter the SQL injection commands in SQL injection list.txt to test the website.  
+
+for adversarial attack:
+```plaintext
+    conda create -n adversarial python=3.7
+    conda activate adversarial
+    pip install -r requirements_adversarial.txt
+    cd adversarial_attack
+    python STGM_batch_version.py
+```
+The STGM_batch_version.py file will generate adversarial examples using STGM.
