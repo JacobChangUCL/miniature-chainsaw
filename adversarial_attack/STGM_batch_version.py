@@ -1,8 +1,9 @@
-import matplotlib.pyplot as plt
+
 import torch
 from torchvision import models
 import numpy as np
 import cv2
+import os
 #这段代码使用了I-FGM算法生成对抗样本。首先定义优化目标。目标是什么？有两种情况。如果是Non-target的情况，那么假设正确
 #标签是[1,0,0],那么我们就要minimum第一个标签的概率。如果是target的情况，那么我们就要maximum目标标签的概率。
 #可以直接用第一个标签的值为优化目标，但是这样做的话，性能会比较差。这里我们用信息论的交叉熵来定义优化目标。这种方式的
@@ -16,12 +17,13 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(device)
 #在这里我需要一个原始图像集
 #图像加载以及预处理
-for i in ['chair','cup','laptop','elephamt']: #we want to generate 4 classes of adversarial captchas
+for i in ['elephant','chair','cup','laptop']: #, we want to generate 4 classes of adversarial captchas
+    if not os.path.exists(f"./captcha/{i}"):
+        os.mkdir(f"./captcha/{i}")
     for j in range(1,10):
+
         image_path=f"data/caltech101/101-small/{i}/image_00{j:02}.jpg"
-        print(image_path=="data/caltech101/101-small/chair/image_0001.jpg")
-        orig = cv2.imread(image_path)###[..., ::-1]
-        print(orig.shape)
+        orig = cv2.imread(image_path)[..., ::-1]
         orig = cv2.resize(orig, (224, 224))
         img = orig.copy().astype(np.float32)
 
@@ -54,7 +56,7 @@ for i in ['chair','cup','laptop','elephamt']: #we want to generate 4 classes of 
         optimizer2 = torch.optim.Adam([img], lr=0.1)
         loss_func = torch.nn.CrossEntropyLoss()
 
-        epochs = 200
+        epochs = 30
         loss_gap = 10  # 在cross entropy中，loss_gap越大,正确标签被选择到的概率越小。这个数值越大
         second_stage_loss_gap = 0.2
         # 优化第一阶段的时间就
@@ -85,35 +87,37 @@ for i in ['chair','cup','laptop','elephamt']: #we want to generate 4 classes of 
             loss.backward()
             optimizer.step()
 
-            for epoch in range(epochs):
-                # 梯度清零
-                optimizer2.zero_grad()
+        for epoch in range(epochs):
+            # 梯度清零
+            optimizer2.zero_grad()
 
-                # forward + backward
-                output = model(img)
-                # 在这里output就是logits层的值
-                target_label_array = np.zeros(output.shape)
-                target_label_array[0][second_stage_target] = 1
+            # forward + backward
+            output = model(img)
+            # 在这里output就是logits层的值
+            target_label_array = np.zeros(output.shape)
+            target_label_array[0][second_stage_target] = 1
 
-                # in this stage,we need to minimize the error between target label and output
-                loss = loss_func(output, torch.from_numpy(target_label_array).to(device))
-                label = np.argmax(output.data.cpu().numpy())
+            # in this stage,we need to minimize the error between target label and output
+            loss = loss_func(output, torch.from_numpy(target_label_array).to(device))
+            label = np.argmax(output.data.cpu().numpy())
 
-                print("epoch={} loss={} label={}".format(epoch, loss, label))
-                if loss < second_stage_loss_gap:
-                    print("second stage attack success")
-                    second_stage_target = label
-                    break
-                # 如果定向攻击成功
-                # if label == target:
-                #     break
-                loss.backward()
-                optimizer2.step()
+            print("epoch={} loss={} label={}".format(epoch, loss, label))
+            if loss < second_stage_loss_gap:
+                print("second stage attack success")
+                second_stage_target = label
+                break
+            # 如果定向攻击成功
+            # if label == target:
+            #     break
+            loss.backward()
+            optimizer2.step()
 
-                adv = img.data.cpu().numpy()[0]
-                adv = adv.transpose(1, 2, 0)
-                adv = (adv * std) + mean
-                adv = adv * 255.0
-                # adv = adv[..., ::-1]  # RGB to BGR
-                adv = np.clip(adv, 0, 255).astype(np.uint8)
-                cv2.imwrite(f"./captcha/{i}/image_00{j:02}.jpg", adv)
+        adv = img.data.cpu().numpy()[0]
+        adv = adv.transpose(1, 2, 0)
+        adv = (adv * std) + mean
+        adv = adv * 255.0
+        # adv = adv[..., ::-1]  # RGB to BGR
+        adv = np.clip(adv, 0, 255).astype(np.uint8)
+
+        cv2.imwrite(f"./captcha/{i}/image_00{j:02}.jpg", adv)
+        print(f"save image to ./captcha/{i}/image_00{j:02}.jpg")

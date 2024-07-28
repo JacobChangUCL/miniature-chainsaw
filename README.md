@@ -1,4 +1,4 @@
-# Security and privay individual 
+# Security and privay individual coursework
 ## the structure of the project
 ```plaintext
 security-and-privacy/                
@@ -68,7 +68,7 @@ security-and-privacy/
 usage:<br>
 for the online forum safe version & unsafe version:
 ```plaintext
-    conda create -n security python=3.7
+    conda create -n security python=3.12
     conda activate security
     pip install -r requirements_online_forum.txt
     cd Online_Forum_Safe_Version       # or Online_Forum_Unsafe_Version
@@ -87,10 +87,10 @@ for SQL injection attack, please enter the SQL injection commands in SQL injecti
 
 for adversarial attack:
 ```plaintext
-    conda create -n adversarial python=3.7
+    conda create -n adversarial python=3.12.3
     conda activate adversarial
     pip install -r requirements_adversarial.txt
     cd adversarial_attack
     python STGM_batch_version.py
 ```
-The STGM_batch_version.py file will generate adversarial examples using STGM.
+The STGM_batch_version.py file will generate adversarial examples using STGM(stochastic targeted gradient method).
